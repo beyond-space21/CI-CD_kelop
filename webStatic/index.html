@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users API Testing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .test-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .test-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+        }
+
+        .response h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .response pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .response.success {
+            border-left-color: #4caf50;
+        }
+
+        .response.error {
+            border-left-color: #f44336;
+        }
+
+        .info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            color: #1565c0;
+            font-size: 14px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .endpoint-info {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Users API Testing</h1>
+
+        <!-- Create User Section -->
+        <div class="test-section">
+            <h2>Create User</h2>
+            <div class="info">
+                <strong>Endpoint:</strong> POST /users/create/<br>
+                <strong>Auth Required:</strong> Yes (Authorization header with Firebase token)
+            </div>
+            <form id="createUserForm">
+                <div class="form-group">
+                    <label for="authToken">Authorization Token *</label>
+                    <input type="password" id="authToken" placeholder="Bearer <firebase_token>" required>
+                </div>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="username">Username *</label>
+                        <input type="text" id="username" placeholder="johndoe" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Name *</label>
+                        <input type="text" id="name" placeholder="John Doe" required>
+                    </div>
+                </div>
+                <button type="submit">Create User</button>
+            </form>
+            <div id="createUserResponse" class="response" style="display: none;"></div>
+        </div>
+
+        <!-- Get User Section -->
+        <div class="test-section">
+            <h2>Get User</h2>
+            <div class="info">
+                <strong>Endpoint:</strong> GET /users/{username}<br>
+                <strong>Auth Required:</strong> No
+            </div>
+            <div class="endpoint-info">
+                ⚠️ Note: This endpoint may not be registered yet. Check the server routes.
+            </div>
+            <form id="getUserForm">
+                <div class="form-group">
+                    <label for="getUsername">Username</label>
+                    <input type="text" id="getUsername" placeholder="johndoe" required>
+                </div>
+                <button type="submit">Get User</button>
+            </form>
+            <div id="getUserResponse" class="response" style="display: none;"></div>
+        </div>
+
+        <!-- Update User Section -->
+        <div class="test-section">
+            <h2>Update User</h2>
+            <div class="info">
+                <strong>Endpoint:</strong> PUT /users/update/<br>
+                <strong>Auth Required:</strong> Yes (Authorization header with Firebase token)
+            </div>
+            <div class="endpoint-info">
+                ⚠️ Note: This endpoint may not be registered yet. Check the server routes.
+            </div>
+            <form id="updateUserForm">
+                <div class="form-group">
+                    <label for="updateAuthToken">Authorization Token *</label>
+                    <input type="password" id="updateAuthToken" placeholder="Bearer <firebase_token>" required>
+                </div>
+                <div class="form-group">
+                    <label for="updateData">Update Data (JSON)</label>
+                    <textarea id="updateData" placeholder='{"username": "newusername", "name": "New Name"}'></textarea>
+                </div>
+                <button type="submit">Update User</button>
+            </form>
+            <div id="updateUserResponse" class="response" style="display: none;"></div>
+        </div>
+
+        <!-- Delete User Section -->
+        <div class="test-section">
+            <h2>Delete User</h2>
+            <div class="info">
+                <strong>Endpoint:</strong> DELETE /users/delete/<br>
+                <strong>Auth Required:</strong> Yes (Authorization header with Firebase token)
+            </div>
+            <div class="endpoint-info">
+                ⚠️ Note: This endpoint may not be registered yet. Check the server routes.
+            </div>
+            <form id="deleteUserForm">
+                <div class="form-group">
+                    <label for="deleteAuthToken">Authorization Token *</label>
+                    <input type="password" id="deleteAuthToken" placeholder="Bearer <firebase_token>" required>
+                </div>
+                <div class="form-group">
+                    <label for="deleteUsername">Username</label>
+                    <input type="text" id="deleteUsername" placeholder="johndoe" required>
+                </div>
+                <button type="submit" style="background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);">Delete User</button>
+            </form>
+            <div id="deleteUserResponse" class="response" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Get server base URL (adjust if needed)
+        const API_BASE = window.location.origin;
+
+        // Helper function to display response
+        function displayResponse(elementId, data, isError = false) {
+            const responseDiv = document.getElementById(elementId);
+            responseDiv.style.display = 'block';
+            responseDiv.className = `response ${isError ? 'error' : 'success'}`;
+            responseDiv.innerHTML = `
+                <h3>${isError ? '❌ Error Response' : '✅ Success Response'}</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+        }
+
+        // Create User
+        document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = document.getElementById('authToken').value;
+            const username = document.getElementById('username').value;
+            const name = document.getElementById('name').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/users/create/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        name: name
+                    })
+                });
+
+                const data = await response.json();
+                displayResponse('createUserResponse', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: data
+                }, !response.ok);
+            } catch (error) {
+                displayResponse('createUserResponse', {
+                    error: error.message
+                }, true);
+            }
+        });
+
+        // Get User
+        document.getElementById('getUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('getUsername').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/users/${username}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                displayResponse('getUserResponse', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: data
+                }, !response.ok);
+            } catch (error) {
+                displayResponse('getUserResponse', {
+                    error: error.message
+                }, true);
+            }
+        });
+
+        // Update User
+        document.getElementById('updateUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = document.getElementById('updateAuthToken').value;
+            const updateData = document.getElementById('updateData').value;
+
+            try {
+                let body = {};
+                if (updateData) {
+                    body = JSON.parse(updateData);
+                }
+
+                const response = await fetch(`${API_BASE}/users/update/`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+                displayResponse('updateUserResponse', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: data
+                }, !response.ok);
+            } catch (error) {
+                displayResponse('updateUserResponse', {
+                    error: error.message
+                }, true);
+            }
+        });
+
+        // Delete User
+        document.getElementById('deleteUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = document.getElementById('deleteAuthToken').value;
+            const username = document.getElementById('deleteUsername').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/users/delete/${username}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                displayResponse('deleteUserResponse', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: data
+                }, !response.ok);
+            } catch (error) {
+                displayResponse('deleteUserResponse', {
+                    error: error.message
+                }, true);
+            }
+        });
+    </script>
+</body>
+</html>

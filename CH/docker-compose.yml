@@ -1,0 +1,26 @@
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
+    restart: unless-stopped
+    ports:
+      - "8123:8123"   # HTTP (Tabix + Web)
+      - "9000:9000"   # Native TCP (Go)
+    environment:
+      CLICKHOUSE_DB: hifi
+      CLICKHOUSE_USER: hifi_user
+      CLICKHOUSE_PASSWORD: hifi_pass
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+
+  tabix:
+    image: spoonest/clickhouse-tabix-web-client:latest
+    container_name: tabix
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - clickhouse
+
+volumes:
+  clickhouse_data:

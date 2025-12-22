@@ -1,0 +1,14 @@
+services:
+  goapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=host.docker.internal
+      - ELASTICSEARCH_HOST=host.docker.internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${GO_SERVER_PORT}:${GO_SERVER_PORT}"
