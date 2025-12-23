@@ -32,7 +32,7 @@
     
     # Copy binary and required files
     COPY --from=builder /app/main .
-    COPY env .env
+    # COPY env .env
     COPY DB/migrations ./DB/migrations
     
     ENTRYPOINT ["/app/main"]

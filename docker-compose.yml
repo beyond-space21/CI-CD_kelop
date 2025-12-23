@@ -3,8 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    env_file:
-      - .env
     environment:
       - POSTGRES_HOST=host.docker.internal
       - ELASTICSEARCH_HOST=host.docker.internal
@@ -12,3 +10,5 @@ services:
       - "host.docker.internal:host-gateway"
     ports:
       - "${GO_SERVER_PORT}:${GO_SERVER_PORT}"
+    volumes:
+      - ~/screts/.env:/app/.env:ro
